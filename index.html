@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>Babylon.js sample code</title>
+    <!-- Babylon.js -->
+    <script src="https://code.jquery.com/pep/0.4.2/pep.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+    <script src="https://preview.babylonjs.com/ammo.js"></script>
+    <script src="https://preview.babylonjs.com/cannon.js"></script>
+    <script src="https://preview.babylonjs.com/Oimo.js"></script>
+    <script src="https://preview.babylonjs.com/earcut.min.js"></script>
+    <script src="https://preview.babylonjs.com/babylon.js"></script>
+    <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+    <script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+    <script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+    <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+    <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
+    <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+
+    <style>
+        html,
+        body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <!-- <script src="audio.js"></script> -->
+    <script>
+        var canvas = document.getElementById("renderCanvas");
+
+        var engine = null;
+        var scene = null;
+        var sceneToRender = null;
+        var createDefaultEngine = function() {
+            return new BABYLON.Engine(canvas, true, {
+                preserveDrawingBuffer: true,
+                stencil: true,
+                disableWebGL2Support: false
+            });
+        };
+
+        // You have to create a function called createScene. This function must return a BABYLON.Scene object
+        // You can reference the following variables: engine, canvas
+        // You must at least define a camera
+        var createScene = function() {
+            var scene = new BABYLON.Scene(engine);
+            engine.displayLoadingUI();
+            BABYLON.Mesh.checkCollisions = true;
+
+            //Sound for the different areas.. 
+            var areaSounds = [];
+            areaSounds.push(new BABYLON.Sound("area1", "audio/tone1.ogg", scene, soundsReady, {
+                loop: true,
+                autoplay: false,
+                spatialSound: true,
+                volume: 0,
+                distanceModel: "exponential",
+                rolloffFactor: 1
+            }));
+
+            areaSounds.push(new BABYLON.Sound("area1", "audio/tone2.ogg", scene, soundsReady, {
+                loop: true,
+                autoplay: false,
+                spatialSound: true,
+                volume: 0,
+                distanceModel: "exponential",
+                rolloffFactor: 1
+            }));
+
+            areaSounds.push(new BABYLON.Sound("area1", "audio/tone3.ogg", scene, soundsReady, {
+                loop: true,
+                autoplay: false,
+                spatialSound: true,
+                volume: 0,
+                distanceModel: "exponential",
+                rolloffFactor: 1
+            }));
+
+            areaSounds.push(new BABYLON.Sound("area1", "audio/tone4.ogg", scene, soundsReady, {
+                loop: true,
+                autoplay: false,
+                spatialSound: true,
+                volume: 0,
+                distanceModel: "exponential",
+                rolloffFactor: 1
+            }));
+
+            var numberOfSoundsReady = 0;
+
+            function soundsReady() {
+                console.log("sounds ready");
+                numberOfSoundsReady++;
+                if (numberOfSoundsReady === areaSounds.length) {
+                    areaSounds.forEach(sound => sound.play());
+                }
+            }
+
+            areaSounds[0].setPosition(new BABYLON.Vector3(2, 0, 7));
+            areaSounds[1].setPosition(new BABYLON.Vector3(-3.6, 0, -9.5));
+            areaSounds[2].setPosition(new BABYLON.Vector3(-14, 0, -7));
+            areaSounds[3].setPosition(new BABYLON.Vector3(1.7, 0, 15));
+
+            var light = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(0, -1, -0.3), scene);
+            let camera;
+            const assumedFramesPerSecond = 20;
+            const earthGravity = -0.1;
+
+
+            scene.createDefaultCameraOrLight(false, true, true);
+            camera = scene.activeCamera;
+
+            camera.attachControl(canvas, true);
+
+            var boxCloud = BABYLON.Mesh.CreateSphere("boxCloud", 400, 1500, scene);
+            boxCloud.position = new BABYLON.Vector3(0, 440, 100);
+            var cloudMaterial = new BABYLON.StandardMaterial("cloudMat", scene);
+            var cloudProcText = new BABYLON.CloudProceduralTexture("cloud", 128, scene);
+            cloudMaterial.emissiveTexture = cloudProcText;
+            cloudMaterial.backFaceCulling = false;
+            cloudMaterial.emissiveTexture.coordinatesMode = BABYLON.Texture.FIXED_EQUIRECTANGULAR_MODE;; //BABYLON.Texture.SKYBOX_MODE;
+            boxCloud.material = cloudMaterial;
+            cloudProcText.skyColor = new BABYLON.Color3(0.3, 0.5, 0.9);
+            cloudProcText.cloudColor = new BABYLON.Color3(0.5, 0.5, 0.55);
+            camera.keysUp.push(87); //W
+            camera.keysDown.push(83) //D
+            camera.keysLeft.push(65); //A
+            camera.keysRight.push(68); //S
+            scene.audioPositioningRefreshRate = 100;
+            camera.position = new BABYLON.Vector3(-1.31, 2, -1.04);
+            camera.speed = .05;
+            var mesh;
+
+            BABYLON.SceneLoader.ImportMesh("", "/", "scene.gltf", scene, function(newMeshes) {
+                console.log("loaded textures/models");
+                newMeshes[0].scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+                setTimeout(function() {
+                    engine.hideLoadingUI();
+                    areaSounds.forEach(sound => sound.setVolume(.6));
+                }, 2000);
+            });
+
+
+            var down = new BABYLON.Vector3(0, -1, 0);
+            var length = 100;
+
+            scene.registerBeforeRender(function() {
+                textInfo.text = "Player's position X:" + (camera.position.x).toFixed(2) + " Z:" + (camera.position.z).toFixed(2);
+                var ray = new BABYLON.Ray(camera.position, down, length);
+                var hit = scene.pickWithRay(ray);
+                if (hit.pickedMesh) {
+                    //set height according to mesh - moving along mesh with collisions is too slow..
+                    scene.activeCamera.position.y = hit.pickedPoint.y + .2;
+                }
+            });
+
+            // GUI
+            let GUIInfo = "Player's position";
+            var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+            var stackPanel = new BABYLON.GUI.StackPanel();
+            stackPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+            stackPanel.isVertical = true;
+            advancedTexture.addControl(stackPanel);
+
+            var textInfo = new BABYLON.GUI.TextBlock();
+            textInfo.color = "white";
+            textInfo.fontSize = 16;
+            textInfo.height = "30px";
+            stackPanel.addControl(textInfo);
+
+            return scene;
+        };
+
+
+
+        var engine;
+        var scene;
+        initFunction = async function() {
+            var asyncEngineCreation = async function() {
+                try {
+                    return createDefaultEngine();
+                } catch (e) {
+                    console.log("the available createEngine function failed. Creating the default engine instead");
+                    return createDefaultEngine();
+                }
+            }
+
+            engine = await asyncEngineCreation();
+            if (!engine) throw 'engine should not be null.';
+            scene = createScene();
+        };
+        initFunction().then(() => {
+            sceneToRender = scene
+            engine.runRenderLoop(function() {
+                if (sceneToRender && sceneToRender.activeCamera) {
+                    sceneToRender.render();
+                }
+            });
+        });
+
+        // Resize
+        window.addEventListener("resize", function() {
+            engine.resize();
+        });
+    </script>
+</body>
+
+</html>
