@@ -1,0 +1,11 @@
+Model Information:
+* title:	Desert Pillar Terrain - RAW Scan
+* source:	https://sketchfab.com/3d-models/desert-pillar-terrain-raw-scan-867910e78d674d608909aa5001b0064f
+* author:	majedhd (https://sketchfab.com/majedhd)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Desert Pillar Terrain - RAW Scan" (https://sketchfab.com/3d-models/desert-pillar-terrain-raw-scan-867910e78d674d608909aa5001b0064f) by majedhd (https://sketchfab.com/majedhd) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
