@@ -128,7 +128,12 @@
 
             camera.attachControl(canvas, true);
 
+            scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
+            scene.fogDensity = 0.1;
+            scene.fogColor = new BABYLON.Color3(0.25, 0.13, 0.09);
+
             var boxCloud = BABYLON.Mesh.CreateSphere("boxCloud", 400, 1500, scene);
+
             boxCloud.position = new BABYLON.Vector3(0, 440, 100);
             var cloudMaterial = new BABYLON.StandardMaterial("cloudMat", scene);
             var cloudProcText = new BABYLON.CloudProceduralTexture("cloud", 128, scene);
