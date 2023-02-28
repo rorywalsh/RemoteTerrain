@@ -30,7 +30,7 @@
             margin: 0;
             padding: 0;
         }
-        
+
         #renderCanvas {
             width: 100%;
             height: 100%;
@@ -48,7 +48,7 @@
         var engine = null;
         var scene = null;
         var sceneToRender = null;
-        var createDefaultEngine = function() {
+        var createDefaultEngine = function () {
             return new BABYLON.Engine(canvas, true, {
                 preserveDrawingBuffer: true,
                 stencil: true,
@@ -59,7 +59,7 @@
         // You have to create a function called createScene. This function must return a BABYLON.Scene object
         // You can reference the following variables: engine, canvas
         // You must at least define a camera
-        var createScene = function() {
+        var createScene = function () {
             var scene = new BABYLON.Scene(engine);
             engine.displayLoadingUI();
             BABYLON.Mesh.checkCollisions = true;
@@ -147,11 +147,11 @@
             camera.speed = .05;
             var mesh;
 
-            BABYLON.SceneLoader.ImportMesh("", "/", "scene.gltf", scene, function(newMeshes) {
+            BABYLON.SceneLoader.ImportMesh("", "/", "scene.gltf", scene, function (newMeshes) {
                 console.log("loaded textures/models");
                 newMeshes[0].scaling = new BABYLON.Vector3(0.6, 0.6, 0.6);
                 newMeshes[0].position.y = -25;
-                setTimeout(function() {
+                setTimeout(function () {
                     engine.hideLoadingUI();
                     areaSounds.forEach(sound => sound.setVolume(.6));
                 }, 2000);
@@ -160,10 +160,8 @@
 
             var down = new BABYLON.Vector3(0, -1, 0);
             var length = 100;
-            var previousXPos = camera.position.x;
+            scene.registerBeforeRender(function () {
 
-            scene.registerBeforeRender(function() {
-                textInfo.text = "Player's position X:" + (camera.position.x).toFixed(2) + " Z:" + (camera.position.z).toFixed(2);
                 var ray = new BABYLON.Ray(camera.position, down, length);
                 var hit = scene.pickWithRay(ray);
                 if (hit.pickedMesh) {
@@ -171,12 +169,36 @@
                     scene.activeCamera.position.y = hit.pickedPoint.y + .2;
                 }
 
-                if(camera.position){
-                    let rotation = camera.position.x - previousXPos;
-                    previousXPos = camera.position.x;
-                    camera.rotation = new BABYLON.Vector3( camera.rotation.x, camera.rotation.y+rotation, camera.rotation.z);
+                textInfo.text = "Player's position X:" + (camera.position.x).toFixed(2) + " Z:" + (camera.position.z).toFixed(2);
+
+            });
+
+            scene.onKeyboardObservable.add((kbInfo) => {
+                if (kbInfo.type === BABYLON.KeyboardEventTypes.KEYDOWN) {
+                    BABYLON.Engine.audioEngine.audioContext?.resume();
+                    if (kbInfo.event.key === 'ArrowLeft' || kbInfo.event.keyCode == 37) {
+
+
+                    }
+                    else if (kbInfo.event.key === 'ArrowRight' || kbInfo.event.keyCode == 39) {
+
+                    }
+                    else if (kbInfo.event.key === 'ArrowUp' || kbInfo.event.keyCode == 87) {
+
+                    }
+                    else if (kbInfo.event.key === 'DownUp' || kbInfo.event.keyCode == 40) {
+
+
+                    }
+
                 }
-    
+                else if (kbInfo.type === BABYLON.KeyboardEventTypes.KEYUP) {
+                    console.log(kbInfo.event.key);
+                    if (kbInfo.event.key === 'ArrowUp' || kbInfo.event.keyCode == 87 || 
+                        kbInfo.event.key === 'ArrowDown' || kbInfo.event.keyCode == 40) {
+
+                    }
+                }
             });
 
             // GUI
@@ -200,8 +222,8 @@
 
         var engine;
         var scene;
-        initFunction = async function() {
-            var asyncEngineCreation = async function() {
+        initFunction = async function () {
+            var asyncEngineCreation = async function () {
                 try {
                     return createDefaultEngine();
                 } catch (e) {
@@ -216,7 +238,7 @@
         };
         initFunction().then(() => {
             sceneToRender = scene
-            engine.runRenderLoop(function() {
+            engine.runRenderLoop(function () {
                 if (sceneToRender && sceneToRender.activeCamera) {
                     sceneToRender.render();
                 }
@@ -224,7 +246,7 @@
         });
 
         // Resize
-        window.addEventListener("resize", function() {
+        window.addEventListener("resize", function () {
             engine.resize();
         });
     </script>
