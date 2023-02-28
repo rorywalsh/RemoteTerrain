@@ -160,6 +160,7 @@
 
             var down = new BABYLON.Vector3(0, -1, 0);
             var length = 100;
+            var previousXPos = camera.position.x;
 
             scene.registerBeforeRender(function() {
                 textInfo.text = "Player's position X:" + (camera.position.x).toFixed(2) + " Z:" + (camera.position.z).toFixed(2);
@@ -169,6 +170,13 @@
                     //set height according to mesh - moving along mesh with collisions is too slow..
                     scene.activeCamera.position.y = hit.pickedPoint.y + .2;
                 }
+
+                if(camera.position){
+                    let rotation = camera.position.x - previousXPos;
+                    previousXPos = camera.position.x;
+                    camera.rotation = new BABYLON.Vector3( camera.rotation.x, camera.rotation.y+rotation, camera.rotation.z);
+                }
+    
             });
 
             // GUI
