@@ -137,7 +137,7 @@
             cloudMaterial.emissiveTexture.coordinatesMode = BABYLON.Texture.FIXED_EQUIRECTANGULAR_MODE;; //BABYLON.Texture.SKYBOX_MODE;
             boxCloud.material = cloudMaterial;
             cloudProcText.skyColor = new BABYLON.Color3(0.3, 0.5, 0.9);
-            cloudProcText.cloudColor = new BABYLON.Color3(0.5, 0.5, 0.55);
+            cloudProcText.cloudColor = new BABYLON.Color3(0.1, 0.1, 0.11);
             camera.keysUp.push(87); //W
             camera.keysDown.push(83) //D
             camera.keysLeft.push(65); //A
@@ -145,6 +145,8 @@
             scene.audioPositioningRefreshRate = 100;
             camera.position = new BABYLON.Vector3(0, 0, 0);
             camera.speed = .05;
+            camera.angularSensibilityX = 20;
+            camera.angularSensibilityZ = 2000;
             var mesh;
 
             BABYLON.SceneLoader.ImportMesh("", "/", "scene.gltf", scene, function (newMeshes) {
@@ -160,8 +162,10 @@
 
             var down = new BABYLON.Vector3(0, -1, 0);
             var length = 100;
-            scene.registerBeforeRender(function () {
+            let turningAngle = 0;
+            const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
+            scene.registerBeforeRender(function () {
                 var ray = new BABYLON.Ray(camera.position, down, length);
                 var hit = scene.pickWithRay(ray);
                 if (hit.pickedMesh) {
@@ -170,33 +174,33 @@
                 }
 
                 textInfo.text = "Player's position X:" + (camera.position.x).toFixed(2) + " Z:" + (camera.position.z).toFixed(2);
+                const forwardVec = new BABYLON.Vector3(0, 0, 1);
+                const forwardVecDir = scene.activeCamera.getDirection(forwardVec);
+                console.log(forwardVecDir.x - turningAngle)
+
+                scene.activeCamera.rotation = new BABYLON.Vector3(scene.activeCamera.rotation.x, scene.activeCamera.rotation.y, (turningAngle - forwardVecDir.x) * 1.5);
+                turningAngle = forwardVecDir.x;
 
             });
+
 
             scene.onKeyboardObservable.add((kbInfo) => {
                 if (kbInfo.type === BABYLON.KeyboardEventTypes.KEYDOWN) {
                     BABYLON.Engine.audioEngine.audioContext?.resume();
-                    if (kbInfo.event.key === 'ArrowLeft' || kbInfo.event.keyCode == 37) {
 
-
-                    }
-                    else if (kbInfo.event.key === 'ArrowRight' || kbInfo.event.keyCode == 39) {
-
-                    }
-                    else if (kbInfo.event.key === 'ArrowUp' || kbInfo.event.keyCode == 87) {
-
+                    if (kbInfo.event.key === 'ArrowUp' || kbInfo.event.keyCode == 87) {
+                        //something could happen here to indicate the craft is moving forward
                     }
                     else if (kbInfo.event.key === 'DownUp' || kbInfo.event.keyCode == 40) {
-
-
+                        //something could happen here to indicate the craft is moving backwards
                     }
 
                 }
                 else if (kbInfo.type === BABYLON.KeyboardEventTypes.KEYUP) {
                     console.log(kbInfo.event.key);
-                    if (kbInfo.event.key === 'ArrowUp' || kbInfo.event.keyCode == 87 || 
+                    if (kbInfo.event.key === 'ArrowUp' || kbInfo.event.keyCode == 87 ||
                         kbInfo.event.key === 'ArrowDown' || kbInfo.event.keyCode == 40) {
-
+                        //something could happen here to indicate that the craft has stopped moving
                     }
                 }
             });
