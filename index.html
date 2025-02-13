@@ -181,7 +181,7 @@
                 textInfo.text = "Player's position X:" + (camera.position.x).toFixed(2) + " Z:" + (camera.position.z).toFixed(2);
                 const forwardVec = new BABYLON.Vector3(0, 0, 1);
                 const forwardVecDir = scene.activeCamera.getDirection(forwardVec);
-                console.log(forwardVecDir.x - turningAngle)
+                //console.log(forwardVecDir.x - turningAngle)
 
                 scene.activeCamera.rotation = new BABYLON.Vector3(scene.activeCamera.rotation.x, scene.activeCamera.rotation.y, (turningAngle - forwardVecDir.x) * 1.5);
                 turningAngle = forwardVecDir.x;
